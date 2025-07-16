@@ -55,9 +55,20 @@ public class PlayerDataManager {
         return instance;
     }
 
-
     public List<Player> getPlayerList() {
         return playerList;
+    }
+
+    /**
+     * Gets a specific player by their position in the list.
+     * @param position The index of the player.
+     * @return The Player object, or null if the position is invalid.
+     */
+    public Player getPlayer(int position) {
+        if (position >= 0 && position < playerList.size()) {
+            return playerList.get(position);
+        }
+        return null;
     }
 
     /**

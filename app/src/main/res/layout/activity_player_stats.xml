@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:context=".PlayerStatsActivity">
+
+        <TextView
+            android:id="@+id/textView_stats_playerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@android:color/white"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            tools:text="Callum" />
+
+        <TextView
+            android:id="@+id/textView_stats_totalPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:textColor="#4CAF50"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            tools:text="Total Points: 100" />
+
+        <TableLayout
+            android:id="@+id/tableLayout_scores"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:stretchColumns="1,2,3">
+
+            <TableRow android:background="#333333" android:padding="8dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:text="Event"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Round 1"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Round 2"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Round 3"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+            </TableRow>
+            <!-- Rows will be added here dynamically -->
+        </TableLayout>
+
+    </LinearLayout>
+</ScrollView>

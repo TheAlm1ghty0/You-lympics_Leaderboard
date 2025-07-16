@@ -23,7 +23,7 @@
         android:id="@+id/button_event1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event 1 (Timed)"
+        android:text="Strawpedo"
         android:onClick="onEventButtonClick"
         android:tag="1"
         android:layout_marginBottom="16dp"/>
@@ -32,7 +32,7 @@
         android:id="@+id/button_event2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event 2 (Timed)"
+        android:text="Race 2 Pint"
         android:onClick="onEventButtonClick"
         android:tag="2"
         android:layout_marginBottom="16dp"/>
@@ -41,7 +41,7 @@
         android:id="@+id/button_event3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event 3 (Timed)"
+        android:text="Crab Run"
         android:onClick="onEventButtonClick"
         android:tag="3"
         android:layout_marginBottom="16dp"/>
@@ -50,7 +50,7 @@
         android:id="@+id/button_event4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event 4 (Timed)"
+        android:text="Ping Pong Run"
         android:onClick="onEventButtonClick"
         android:tag="4"
         android:layout_marginBottom="16dp"/>
@@ -59,7 +59,7 @@
         android:id="@+id/button_event5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event 5 (Positional)"
+        android:text="Elimination Stacks"
         android:onClick="onEventButtonClick"
         android:tag="5"
         android:layout_marginBottom="16dp"/>
@@ -68,8 +68,24 @@
         android:id="@+id/button_event6"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event 6 (Positional)"
+        android:text="Elimination Slaps"
         android:onClick="onEventButtonClick"
-        android:tag="6"/>
+        android:tag="6"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/button_event7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Event 7 (Coming Soon)"
+        android:enabled="false"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/button_event8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Event 8 (Coming Soon)"
+        android:enabled="false"/>
 
 </LinearLayout>

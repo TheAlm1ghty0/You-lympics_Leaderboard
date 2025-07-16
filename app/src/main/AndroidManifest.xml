@@ -22,6 +22,7 @@
         </activity>
         <activity android:name=".EventsActivity" />
         <activity android:name=".ScoreEntryActivity" />
+        <activity android:name=".PlayerStatsActivity" />
     </application>
 
 </manifest>
