@@ -20,6 +20,37 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Container for the visibility checkboxes -->
+    <LinearLayout
+        android:id="@+id/visibility_controls_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/textView_event_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <CheckBox
+            android:id="@+id/checkbox_show_round2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show Extra 1"
+            android:textColor="@android:color/white"
+            android:layout_marginEnd="16dp"/>
+
+        <CheckBox
+            android:id="@+id/checkbox_show_round3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show Extra 2"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_score_entry"
         android:layout_width="0dp"
@@ -29,7 +60,7 @@
         app:layout_constraintBottom_toTopOf="@+id/button_save_scores"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_event_title"
+        app:layout_constraintTop_toBottomOf="@+id/visibility_controls_container"
         tools:listitem="@layout/score_entry_item" />
 
     <Button

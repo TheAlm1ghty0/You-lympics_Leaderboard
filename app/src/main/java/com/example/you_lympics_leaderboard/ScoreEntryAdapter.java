@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,11 +17,26 @@ public class ScoreEntryAdapter extends RecyclerView.Adapter<ScoreEntryAdapter.Sc
 
     private List<Player> playerList;
     private int eventNumber;
+    // Variables to hold the visibility state
+    private boolean isRound2Visible = false;
+    private boolean isRound3Visible = false;
 
     public ScoreEntryAdapter(List<Player> playerList, int eventNumber) {
         this.playerList = playerList;
         this.eventNumber = eventNumber;
     }
+
+    // Methods to update visibility from the Activity
+    public void setRound2Visibility(boolean isVisible) {
+        isRound2Visible = isVisible;
+        notifyDataSetChanged(); // Redraw the whole list
+    }
+
+    public void setRound3Visibility(boolean isVisible) {
+        isRound3Visible = isVisible;
+        notifyDataSetChanged(); // Redraw the whole list
+    }
+
 
     @NonNull
     @Override
@@ -31,9 +47,7 @@ public class ScoreEntryAdapter extends RecyclerView.Adapter<ScoreEntryAdapter.Sc
 
     @Override
     public void onBindViewHolder(@NonNull ScoreEntryViewHolder holder, int position) {
-        // We pass the player object to the holder's bind method.
-        // The holder is now responsible for managing its own listeners.
-        holder.bind(playerList.get(position), eventNumber);
+        holder.bind(playerList.get(position), eventNumber, isRound2Visible, isRound3Visible);
     }
 
     @Override
@@ -41,56 +55,51 @@ public class ScoreEntryAdapter extends RecyclerView.Adapter<ScoreEntryAdapter.Sc
         return playerList.size();
     }
 
-    /**
-     * The ViewHolder now contains the TextWatchers. This is crucial for correctly
-     * adding and removing them as views are recycled.
-     */
     static class ScoreEntryViewHolder extends RecyclerView.ViewHolder {
         TextView playerNameTextView;
         EditText round1ScoreEditText, round2ScoreEditText, round3ScoreEditText;
+        // Add references to the containers
+        LinearLayout round2Container, round3Container;
 
-        // Store the watchers to remove them later
         private TextWatcher round1Watcher, round2Watcher, round3Watcher;
 
         public ScoreEntryViewHolder(@NonNull View itemView) {
             super(itemView);
-            // These findViewById calls link the layout's views to our Java objects.
-            // An error here would mean the IDs in score_entry_item.xml are incorrect.
             playerNameTextView = itemView.findViewById(R.id.textView_playerName_entry);
             round1ScoreEditText = itemView.findViewById(R.id.editText_round1_score);
             round2ScoreEditText = itemView.findViewById(R.id.editText_round2_score);
             round3ScoreEditText = itemView.findViewById(R.id.editText_round3_score);
+            // Link the container views
+            round2Container = itemView.findViewById(R.id.container_round2);
+            round3Container = itemView.findViewById(R.id.container_round3);
         }
 
-        /**
-         * Binds a player's data to the view and correctly manages TextWatchers.
-         */
-        public void bind(final Player player, final int eventNumber) {
+        public void bind(final Player player, final int eventNumber, boolean isR2Visible, boolean isR3Visible) {
             playerNameTextView.setText(player.getName());
 
-            // --- THIS IS THE CRITICAL FIX ---
-            // 1. Remove any existing listeners from the recycled view before using it.
+            // Set visibility of the containers
+            round2Container.setVisibility(isR2Visible ? View.VISIBLE : View.GONE);
+            round3Container.setVisibility(isR3Visible ? View.VISIBLE : View.GONE);
+
+            // The rest of the bind logic remains the same...
             if (round1Watcher != null) round1ScoreEditText.removeTextChangedListener(round1Watcher);
             if (round2Watcher != null) round2ScoreEditText.removeTextChangedListener(round2Watcher);
             if (round3Watcher != null) round3ScoreEditText.removeTextChangedListener(round3Watcher);
 
-            // 2. Configure the input fields based on the event type
-            if (eventNumber <= 4) { // Timed event
+            if (eventNumber <= 4) {
                 configureEditText(round1ScoreEditText, InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_TIME, "MM:SS");
                 configureEditText(round2ScoreEditText, InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_TIME, "MM:SS");
                 configureEditText(round3ScoreEditText, InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_TIME, "MM:SS");
-            } else { // Positional event
+            } else {
                 configureEditText(round1ScoreEditText, InputType.TYPE_CLASS_NUMBER, "1-10");
                 configureEditText(round2ScoreEditText, InputType.TYPE_CLASS_NUMBER, "1-10");
                 configureEditText(round3ScoreEditText, InputType.TYPE_CLASS_NUMBER, "1-10");
             }
 
-            // 3. Set the text *after* removing the old listeners.
             round1ScoreEditText.setText(player.getScore(1, eventNumber));
             round2ScoreEditText.setText(player.getScore(2, eventNumber));
             round3ScoreEditText.setText(player.getScore(3, eventNumber));
 
-            // 4. Create and add the new, correct listeners.
             round1Watcher = new TextWatcher() {
                 @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
                 @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
