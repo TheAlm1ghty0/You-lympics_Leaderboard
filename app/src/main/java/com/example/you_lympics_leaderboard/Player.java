@@ -10,15 +10,9 @@ import java.util.Map;
 public class Player {
 
     private String name;
-    // Using a Map to store scores. The key will be a unique identifier for the event,
-    // e.g., "round1_event1", "round2_event4".
     private Map<String, String> scores;
     private int totalPoints;
 
-    /**
-     * Constructor for a new Player.
-     * @param name The name of the player.
-     */
     public Player(String name) {
         this.name = name;
         this.scores = new HashMap<>();
@@ -26,11 +20,6 @@ public class Player {
         this.totalPoints = 0;
     }
 
-    /**
-     * Initializes the scores for all events to default values.
-     * Timed events default to "00:00".
-     * Positional events default to "0".
-     */
     private void initializeScores() {
         for (int round = 1; round <= 3; round++) {
             for (int event = 1; event <= 6; event++) {
@@ -58,23 +47,11 @@ public class Player {
         return scores;
     }
 
-    /**
-     * Gets a specific score for a given round and event.
-     * @param round The round number (1-3).
-     * @param event The event number (1-6).
-     * @return The score as a String.
-     */
     public String getScore(int round, int event) {
         String key = "round" + round + "_event" + event;
         return scores.get(key);
     }
 
-    /**
-     * Sets a specific score for a given round and event.
-     * @param round The round number (1-3).
-     * @param event The event number (1-6).
-     * @param score The score as a String (e.g., "01:30" or "8").
-     */
     public void setScore(int round, int event, String score) {
         String key = "round" + round + "_event" + event;
         scores.put(key, score);
@@ -89,21 +66,120 @@ public class Player {
     }
 
     /**
-     * Calculates the total points for the player based on all event scores.
-     * This method needs to be implemented based on the scoring logic
-     * for converting times and positions into points.
+     * Helper method to convert "MM:SS" time strings into total seconds for comparison.
+     * @param time The time string, e.g., "01:30".
+     * @return The total number of seconds, or a very large number if the format is invalid.
+     */
+    private int timeToSeconds(String time) {
+        if (time == null || !time.contains(":")) {
+            return Integer.MAX_VALUE; // Invalid format, treat as worst possible time
+        }
+        String[] parts = time.split(":");
+        if (parts.length != 2) {
+            return Integer.MAX_VALUE;
+        }
+        try {
+            int minutes = Integer.parseInt(parts[0]);
+            int seconds = Integer.parseInt(parts[1]);
+            return (minutes * 60) + seconds;
+        } catch (NumberFormatException e) {
+            return Integer.MAX_VALUE; // Invalid number, treat as worst possible time
+        }
+    }
+
+    /**
+     * Calculates the total points for the player based on personal improvement
+     * across rounds for each event.
      */
     public void calculateTotalPoints() {
-        // This is a placeholder. The actual calculation logic will be complex
-        // and will depend on how times are converted to points.
-        // For now, we'll just sum the positional scores as a simple example.
-        int calculatedPoints = 0;
-        for (int round = 1; round <= 3; round++) {
-            for (int event = 5; event <= 6; event++) { // Only positional events
-                String key = "round" + round + "_event" + event;
-                calculatedPoints += Integer.parseInt(scores.get(key));
+        int calculatedTotal = 0;
+        // Iterate through each of the 6 events
+        for (int event = 1; event <= 6; event++) {
+            String r1ScoreStr = getScore(1, event);
+            String r2ScoreStr = getScore(2, event);
+            String r3ScoreStr = getScore(3, event);
+
+            // Events 1-4 are timed, so a lower score is better.
+            if (event <= 4) {
+                int r1Time = timeToSeconds(r1ScoreStr);
+
+                // If Round 1 was not played or is invalid, no points can be scored for this event.
+                if (r1Time == 0 || r1Time == Integer.MAX_VALUE) {
+                    continue;
+                }
+
+                int r2Time = timeToSeconds(r2ScoreStr);
+                int r3Time = timeToSeconds(r3ScoreStr);
+
+                // --- Round 2 Scoring ---
+                // Only score if R2 has a valid, non-default time.
+                if (r2Time != 0 && r2Time != Integer.MAX_VALUE) {
+                    if (r2Time < r1Time) {
+                        calculatedTotal += 2; // Beat previous score
+                    } else if (r2Time == r1Time) {
+                        calculatedTotal += 1; // Matched previous score
+                    }
+                }
+
+                // --- Round 3 Scoring ---
+                // Only score if R3 has a valid, non-default time.
+                if (r3Time != 0 && r3Time != Integer.MAX_VALUE) {
+                    int bestOfR1R2 = r1Time;
+                    // If R2 was also played, find the best of R1 and R2.
+                    if (r2Time != 0 && r2Time != Integer.MAX_VALUE) {
+                        bestOfR1R2 = Math.min(r1Time, r2Time);
+                    }
+
+                    if (r3Time < bestOfR1R2) {
+                        calculatedTotal += 2; // Beat previous best score
+                    } else if (r3Time == bestOfR1R2) {
+                        calculatedTotal += 1; // Matched previous best score
+                    }
+                }
+            }
+            // Events 5-6 are positional, so a lower score is better.
+            else {
+                try {
+                    int r1Pos = Integer.parseInt(r1ScoreStr);
+
+                    // If Round 1 was not played, no points can be scored for this event.
+                    if (r1Pos == 0) {
+                        continue;
+                    }
+
+                    int r2Pos = Integer.parseInt(r2ScoreStr);
+                    int r3Pos = Integer.parseInt(r3ScoreStr);
+
+                    // --- Round 2 Scoring ---
+                    // Only score if R2 has a non-default score.
+                    if (r2Pos != 0) {
+                        if (r2Pos < r1Pos) {
+                            calculatedTotal += 2;
+                        } else if (r2Pos == r1Pos) {
+                            calculatedTotal += 1;
+                        }
+                    }
+
+                    // --- Round 3 Scoring ---
+                    // Only score if R3 has a non-default score.
+                    if (r3Pos != 0) {
+                        int bestOfR1R2 = r1Pos;
+                        // If R2 was also played, find the best of R1 and R2.
+                        if (r2Pos != 0) {
+                            bestOfR1R2 = Math.min(r1Pos, r2Pos);
+                        }
+
+                        if (r3Pos < bestOfR1R2) {
+                            calculatedTotal += 2;
+                        } else if (r3Pos == bestOfR1R2) {
+                            calculatedTotal += 1;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    // If a score is not a valid number (e.g., empty), do nothing.
+                }
             }
         }
-        this.totalPoints = calculatedPoints;
+        this.totalPoints = calculatedTotal;
     }
 }
