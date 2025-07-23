@@ -14,16 +14,12 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
 
     private List<Player> playerList;
     private Context context;
+    private int rankOffset; // To start ranking from a specific number (e.g., 4)
 
-    public PlayerAdapter(List<Player> playerList, Context context) {
+    public PlayerAdapter(List<Player> playerList, Context context, int rankOffset) {
         this.playerList = playerList;
         this.context = context;
-    }
-
-    // Overloaded constructor for landscape view where context is not needed for clicks
-    public PlayerAdapter(List<Player> playerList) {
-        this.playerList = playerList;
-        this.context = null;
+        this.rankOffset = rankOffset;
     }
 
     @NonNull
@@ -36,14 +32,14 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
     @Override
     public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position) {
         Player player = playerList.get(position);
-        holder.rankTextView.setText(String.valueOf(position + 1));
+        // Use the offset to display the correct rank
+        holder.rankTextView.setText(String.valueOf(position + rankOffset));
         holder.playerNameTextView.setText(player.getName());
         holder.totalPointsTextView.setText(String.valueOf(player.getTotalPoints()));
 
         if (context != null) {
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, PlayerStatsActivity.class);
-                // We need to find the original position of the player in the full list
                 int originalPosition = PlayerDataManager.getInstance().getPlayerList().indexOf(player);
                 intent.putExtra("PLAYER_POSITION", originalPosition);
                 context.startActivity(intent);

@@ -11,7 +11,7 @@
         android:id="@+id/textView_event_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="80dp"
         android:text="Enter Scores for Event X"
         android:textColor="@android:color/white"
         android:textSize="24sp"
@@ -20,48 +20,172 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Modern Dropdown using Material Components with our custom style -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/player_select_layout"
+        style="@style/CustomExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="32dp"
+        android:hint="Player Select"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView_event_title">
+
+        <AutoCompleteTextView
+            android:id="@+id/player_autocomplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textColor="#D3D3D3"
+            android:popupBackground="@drawable/spinner_dropdown_background" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <!-- This container holds all the score fields for the selected player -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/score_fields_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/player_select_layout"
+        tools:visibility="visible">
+
+        <!-- Round 1 Container -->
+        <LinearLayout
+            android:id="@+id/container_round1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="R1:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/editText_round1_score"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:hint="Score"
+                android:inputType="number"
+                android:textColor="@android:color/white"
+                android:textColorHint="#888888" />
+        </LinearLayout>
+
+        <!-- Round 2 Container -->
+        <LinearLayout
+            android:id="@+id/container_round2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/container_round1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/container_round3"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="R2:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/editText_round2_score"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:hint="Score"
+                android:inputType="number"
+                android:textColor="@android:color/white"
+                android:textColorHint="#888888" />
+        </LinearLayout>
+
+        <!-- Round 3 Container -->
+        <LinearLayout
+            android:id="@+id/container_round3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/container_round1"
+            app:layout_constraintStart_toEndOf="@id/container_round2"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="R3:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/editText_round3_score"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:hint="Score"
+                android:inputType="number"
+                android:textColor="@android:color/white"
+                android:textColorHint="#888888" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <!-- Container for the visibility checkboxes -->
     <LinearLayout
         android:id="@+id/visibility_controls_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
         android:gravity="center"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@id/textView_event_title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/button_save_scores"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <CheckBox
             android:id="@+id/checkbox_show_round2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Show Extra 1"
-            android:textColor="@android:color/white"
-            android:layout_marginEnd="16dp"/>
+            android:layout_marginEnd="16dp"
+            android:text="Show Round 2"
+            android:textColor="@android:color/white" />
 
         <CheckBox
             android:id="@+id/checkbox_show_round3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Show Extra 2"
+            android:text="Show Round 3"
             android:textColor="@android:color/white" />
-
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView_score_entry"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/button_save_scores"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/visibility_controls_container"
-        tools:listitem="@layout/score_entry_item" />
 
     <Button
         android:id="@+id/button_save_scores"

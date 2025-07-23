@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomPopupMenu" parent="@style/Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">@drawable/popup_menu_background</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <!-- New Style for the Modern Dropdown Menu -->
+    <style name="CustomExposedDropdownMenu" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <!-- Color for the floating label text -->
+        <item name="hintTextColor">@color/text_input_layout_colors</item>
+        <!-- Color for the outline -->
+        <item name="boxStrokeColor">@color/text_input_layout_colors</item>
+        <!-- Background color of the dropdown box -->
+        <item name="boxBackgroundColor">#404040</item>
+        <!-- Color for the initial hint text before it floats -->
+        <item name="android:textColorHint">#D3D3D3</item>
+    </style>
+</resources>

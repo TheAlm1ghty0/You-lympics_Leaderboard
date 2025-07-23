@@ -12,10 +12,12 @@ public class Player {
     private String name;
     private Map<String, String> scores;
     private int totalPoints;
+    private String planeSeat; // New field for the tie-breaker
 
     public Player(String name) {
         this.name = name;
         this.scores = new HashMap<>();
+        this.planeSeat = ""; // Default to empty
         initializeScores();
         this.totalPoints = 0;
     }
@@ -63,6 +65,14 @@ public class Player {
 
     public void setTotalPoints(int totalPoints) {
         this.totalPoints = totalPoints;
+    }
+
+    public String getPlaneSeat() {
+        return planeSeat;
+    }
+
+    public void setPlaneSeat(String planeSeat) {
+        this.planeSeat = planeSeat;
     }
 
     /**

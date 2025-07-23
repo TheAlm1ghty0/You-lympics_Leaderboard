@@ -1,115 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp"
     android:background="#121212"
+    android:padding="24dp"
     tools:context=".EventsActivity">
 
+    <!-- Title is now a static header -->
     <TextView
+        android:id="@+id/textView_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Select Event to Score"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginBottom="32dp"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/button_back"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
+        android:background="@android:color/transparent"
+        android:onClick="onBackButtonClick"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="Back to Leaderboard"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Left Column -->
-        <LinearLayout
-            android:layout_width="0dp"
+    <!-- Left Column -->
+    <LinearLayout
+        android:id="@+id/left_column"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingEnd="12dp"
+        app:layout_constraintBottom_toTopOf="@id/button_back"
+        app:layout_constraintEnd_toStartOf="@+id/right_column"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView_title"
+        app:layout_constraintVertical_bias="0.5">
+
+        <Button
+            android:id="@+id/button_event1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingEnd="12dp">
+            android:layout_marginBottom="12dp"
+            android:onClick="onEventButtonClick"
+            android:tag="1"
+            android:text="Strawpedo" />
 
-            <Button
-                android:id="@+id/button_event1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Strawpedo"
-                android:onClick="onEventButtonClick"
-                android:tag="1"
-                android:layout_marginBottom="16dp"/>
-
-            <Button
-                android:id="@+id/button_event2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Race 2 Pint"
-                android:onClick="onEventButtonClick"
-                android:tag="2"
-                android:layout_marginBottom="16dp"/>
-
-            <Button
-                android:id="@+id/button_event3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Crab Run"
-                android:onClick="onEventButtonClick"
-                android:tag="3"
-                android:layout_marginBottom="16dp"/>
-
-            <Button
-                android:id="@+id/button_event4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Ping Pong Run"
-                android:onClick="onEventButtonClick"
-                android:tag="4"/>
-
-        </LinearLayout>
-
-        <!-- Right Column -->
-        <LinearLayout
-            android:layout_width="0dp"
+        <Button
+            android:id="@+id/button_event2"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingStart="12dp">
+            android:layout_marginBottom="12dp"
+            android:onClick="onEventButtonClick"
+            android:tag="2"
+            android:text="Race 2 Pint" />
 
-            <Button
-                android:id="@+id/button_event5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Elimination Stacks"
-                android:onClick="onEventButtonClick"
-                android:tag="5"
-                android:layout_marginBottom="16dp"/>
+        <Button
+            android:id="@+id/button_event3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:onClick="onEventButtonClick"
+            android:tag="3"
+            android:text="Crab Run" />
 
-            <Button
-                android:id="@+id/button_event6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Elimination Slaps"
-                android:onClick="onEventButtonClick"
-                android:tag="6"
-                android:layout_marginBottom="16dp"/>
+        <Button
+            android:id="@+id/button_event4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onEventButtonClick"
+            android:tag="4"
+            android:text="Ping Pong Run" />
 
-            <Button
-                android:id="@+id/button_event7"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Event 7 (Coming Soon)"
-                android:enabled="false"
-                android:layout_marginBottom="16dp"/>
-
-            <Button
-                android:id="@+id/button_event8"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Event 8 (Coming Soon)"
-                android:enabled="false"/>
-
-        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+    <!-- Right Column -->
+    <LinearLayout
+        android:id="@+id/right_column"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        app:layout_constraintBottom_toTopOf="@id/button_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/left_column"
+        app:layout_constraintTop_toBottomOf="@id/textView_title"
+        app:layout_constraintVertical_bias="0.5">
+
+        <Button
+            android:id="@+id/button_event5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:onClick="onEventButtonClick"
+            android:tag="5"
+            android:text="Elimination Slaps" />
+
+        <Button
+            android:id="@+id/button_event6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:onClick="onEventButtonClick"
+            android:tag="6"
+            android:text="Elimination Stacks" />
+
+        <Button
+            android:id="@+id/button_event7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:enabled="false"
+            android:text="Event 7 (Coming Soon)"
+            android:textColor="#9E9E9E"
+            app:backgroundTint="#404040" />
+
+        <Button
+            android:id="@+id/button_event8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Event 8 (Coming Soon)"
+            android:textColor="#9E9E9E"
+            app:backgroundTint="#404040" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

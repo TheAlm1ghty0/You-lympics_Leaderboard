@@ -10,7 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:paddingTop="48dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
         tools:context=".PlayerStatsActivity">
 
         <TextView
@@ -33,6 +36,36 @@
             android:textSize="22sp"
             android:textStyle="bold"
             tools:text="Total Points: 100" />
+
+        <!-- Plane Seat Input -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plane Seat (Tie-Breaker):"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <EditText
+                android:id="@+id/editText_plane_seat"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:hint="e.g. 12C"
+                android:inputType="textCapCharacters"
+                android:maxLength="3"
+                android:textColor="@android:color/white"
+                android:textColorHint="#888888" />
+        </LinearLayout>
+
 
         <TableLayout
             android:id="@+id/tableLayout_scores"

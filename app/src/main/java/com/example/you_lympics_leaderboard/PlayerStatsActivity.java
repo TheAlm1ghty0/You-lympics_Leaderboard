@@ -1,7 +1,10 @@
 package com.example.you_lympics_leaderboard;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
+import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -12,10 +15,11 @@ import java.util.List;
 public class PlayerStatsActivity extends AppCompatActivity {
 
     private Player player;
+    private EditText planeSeatEditText;
 
     private final List<String> eventNames = Arrays.asList(
             "Strawpedo", "Race 2 Pint", "Crab Run",
-            "Ping Pong Run", "Elimination Stacks", "Elimination Slaps"
+            "Ping Pong Run", "Elimination Slaps", "Elimination Stacks"
     );
 
     @Override
@@ -28,9 +32,18 @@ public class PlayerStatsActivity extends AppCompatActivity {
             player = PlayerDataManager.getInstance().getPlayer(playerPosition);
         }
 
+        planeSeatEditText = findViewById(R.id.editText_plane_seat);
+
         if (player != null) {
             populatePlayerData();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Save data when the user leaves the screen
+        PlayerDataManager.getInstance().saveData(this);
     }
 
     private void populatePlayerData() {
@@ -41,7 +54,21 @@ public class PlayerStatsActivity extends AppCompatActivity {
         playerNameTextView.setText(player.getName());
         totalPointsTextView.setText("Total Points: " + player.getTotalPoints());
 
-        // Populate the table
+        // Set plane seat and add a listener to save changes
+        planeSeatEditText.setText(player.getPlaneSeat());
+        planeSeatEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                player.setPlaneSeat(s.toString().toUpperCase());
+            }
+        });
+
+
+        // Populate the scores table
         for (int i = 0; i < eventNames.size(); i++) {
             TableRow row = new TableRow(this);
             TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);

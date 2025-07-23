@@ -31,4 +31,13 @@ public class EventsActivity extends AppCompatActivity {
         // Start the activity
         startActivity(intent);
     }
+
+    /**
+     * Handles the click for the new back button.
+     * It closes the current activity, returning to the previous one (MainActivity).
+     * @param view The button that was clicked.
+     */
+    public void onBackButtonClick(View view) {
+        finish();
+    }
 }
