@@ -158,6 +158,32 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Container for the new video buttons -->
+    <LinearLayout
+        android:id="@+id/video_buttons_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/score_fields_container"
+        app:layout_constraintBottom_toTopOf="@id/visibility_controls_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/button_video1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video 1"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/button_video2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video 2"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
     <!-- Container for the visibility checkboxes -->
     <LinearLayout
         android:id="@+id/visibility_controls_container"

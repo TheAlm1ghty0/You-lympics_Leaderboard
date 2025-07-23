@@ -2,20 +2,23 @@ package com.example.you_lympics_leaderboard;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListPopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         playerList = PlayerDataManager.getInstance(this).getPlayerList();
 
         menuButton = findViewById(R.id.button_menu);
-        menuButton.setOnClickListener(this::showPopupMenu);
+        menuButton.setOnClickListener(this::showMenuPopup);
     }
 
     @Override
@@ -85,34 +88,48 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showPopupMenu(View view) {
-        ContextThemeWrapper wrapper = new ContextThemeWrapper(this, R.style.CustomPopupMenu);
-        PopupMenu popup = new PopupMenu(wrapper, view);
-        popup.getMenuInflater().inflate(R.menu.main_menu, popup.getMenu());
+    private void showMenuPopup(View view) {
+        ListPopupWindow listPopupWindow = new ListPopupWindow(this);
+
+        List<String> options = Arrays.asList("Edit Scores", "Reset All Scores");
+        // Use the same item layout as the spinner for consistent white text
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_dropdown_item, options);
+        listPopupWindow.setAdapter(adapter);
+
+        listPopupWindow.setAnchorView(view);
+        // Use the dimension resource for a responsive width
+        listPopupWindow.setWidth(getResources().getDimensionPixelSize(R.dimen.popup_menu_width));
+
+        // Calculate the offset to move the popup up by the height of the button
+        int verticalOffset = -view.getHeight();
+        listPopupWindow.setVerticalOffset(verticalOffset);
+
+        // Use the same background as the spinner for consistent rounded corners and color
+        listPopupWindow.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.spinner_dropdown_background));
+        listPopupWindow.setModal(true);
+
+        listPopupWindow.setOnItemClickListener((parent, itemView, position, id) -> {
+            if (position == 0) { // Edit Scores
+                startActivity(new Intent(MainActivity.this, EventsActivity.class));
+            } else if (position == 1) { // Reset All Scores
+                showResetConfirmationDialog();
+            }
+            listPopupWindow.dismiss();
+        });
 
         // Animate the button opening
         Animation openAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_open);
         menuButton.startAnimation(openAnimation);
 
-        popup.setOnDismissListener(menu -> {
+        listPopupWindow.setOnDismissListener(() -> {
             // Animate the button closing
             Animation closeAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_close);
             menuButton.startAnimation(closeAnimation);
         });
 
-        popup.setOnMenuItemClickListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.action_edit_scores) {
-                startActivity(new Intent(MainActivity.this, EventsActivity.class));
-                return true;
-            } else if (itemId == R.id.action_reset_scores) {
-                showResetConfirmationDialog();
-                return true;
-            }
-            return false;
-        });
-        popup.show();
+        listPopupWindow.show();
     }
+
 
     private void showResetConfirmationDialog() {
         new AlertDialog.Builder(this)
@@ -122,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
                     PlayerDataManager.getInstance().resetAllData(this);
                     this.playerList = PlayerDataManager.getInstance().getPlayerList();
                     setupLeaderboard();
+                    // Show a confirmation message
+                    Toast.makeText(this, "All scores have been reset.", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)
                 .setIcon(android.R.drawable.ic_dialog_alert)

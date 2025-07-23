@@ -22,7 +22,7 @@
                 android:id="@+id/podium_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="64dp"
                 android:gravity="bottom"
                 android:orientation="horizontal"
                 android:paddingStart="8dp"
@@ -37,13 +37,6 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="8dp">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginBottom="4dp"
-                        android:src="@android:drawable/star_on"
-                        app:tint="#C0C0C0" />
 
                     <TextView
                         android:id="@+id/textView_2nd_name"
@@ -61,11 +54,23 @@
                         android:textSize="16sp"
                         tools:text="90" />
 
-                    <View
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="80dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#C0C0C0" />
+                        android:layout_marginTop="8dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#C0C0C0" />
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/second"
+                            app:tint="#000000" />
+                    </FrameLayout>
                 </LinearLayout>
 
                 <!-- 1st Place -->
@@ -77,13 +82,6 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="8dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginBottom="4dp"
-                        android:src="@android:drawable/star_on"
-                        app:tint="#FFD700" />
 
                     <TextView
                         android:id="@+id/textView_1st_name"
@@ -102,11 +100,23 @@
                         android:textSize="20sp"
                         tools:text="100" />
 
-                    <View
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="120dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#FFD700" />
+                        android:layout_marginTop="8dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#FFD700" />
+
+                        <ImageView
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/medal"
+                            app:tint="#000000" />
+                    </FrameLayout>
                 </LinearLayout>
 
                 <!-- 3rd Place -->
@@ -118,13 +128,6 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="8dp">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginBottom="4dp"
-                        android:src="@android:drawable/star_on"
-                        app:tint="#CD7F32" />
 
                     <TextView
                         android:id="@+id/textView_3rd_name"
@@ -142,11 +145,23 @@
                         android:textSize="16sp"
                         tools:text="80" />
 
-                    <View
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#CD7F32" />
+                        android:layout_marginTop="8dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#CD7F32" />
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/third"
+                            app:tint="#000000" />
+                    </FrameLayout>
                 </LinearLayout>
             </LinearLayout>
 

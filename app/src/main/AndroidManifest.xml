@@ -23,6 +23,10 @@
         <activity android:name=".EventsActivity" />
         <activity android:name=".ScoreEntryActivity" />
         <activity android:name=".PlayerStatsActivity" />
+        <activity
+            android:name=".VideoPlayerActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
     </application>
 
 </manifest>

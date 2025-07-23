@@ -1,5 +1,6 @@
 package com.example.you_lympics_leaderboard;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -12,6 +13,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -30,11 +33,10 @@ public class ScoreEntryActivity extends AppCompatActivity {
     private LinearLayout round2Container, round3Container;
     private EditText round1EditText, round2EditText, round3EditText;
     private CheckBox showRound2CheckBox, showRound3CheckBox;
+    private Button video1Button, video2Button;
 
-    // TextWatchers to prevent listener conflicts
     private TextWatcher r1Watcher, r2Watcher, r3Watcher;
 
-    // List of event names
     private final List<String> eventNames = Arrays.asList(
             "Strawpedo", "Race 2 Pint", "Crab Run",
             "Ping Pong Run", "Elimination Slaps", "Elimination Stacks"
@@ -47,10 +49,10 @@ public class ScoreEntryActivity extends AppCompatActivity {
 
         eventNumber = getIntent().getIntExtra("EVENT_NUMBER", 0);
 
-        // Initialize all UI components
         findViews();
         setupPlayerDropdown();
         setupCheckboxListeners();
+        setupVideoButtons();
 
         Button saveButton = findViewById(R.id.button_save_scores);
         saveButton.setOnClickListener(v -> finish());
@@ -79,7 +81,32 @@ public class ScoreEntryActivity extends AppCompatActivity {
         round3EditText = findViewById(R.id.editText_round3_score);
         showRound2CheckBox = findViewById(R.id.checkbox_show_round2);
         showRound3CheckBox = findViewById(R.id.checkbox_show_round3);
+        video1Button = findViewById(R.id.button_video1);
+        video2Button = findViewById(R.id.button_video2);
     }
+
+    private void setupVideoButtons() {
+        video1Button.setOnClickListener(v -> playVideo(1));
+        video2Button.setOnClickListener(v -> playVideo(2));
+    }
+
+    private void playVideo(int videoNumber) {
+        if (eventNumber < 1 || eventNumber > eventNames.size()) return;
+
+        String eventNameRaw = eventNames.get(eventNumber - 1).toLowerCase().replaceAll("\\s+", "");
+        String videoFileName = eventNameRaw + videoNumber;
+
+        int videoResId = getResources().getIdentifier(videoFileName, "raw", getPackageName());
+
+        if (videoResId != 0) {
+            Intent intent = new Intent(this, VideoPlayerActivity.class);
+            intent.putExtra(VideoPlayerActivity.VIDEO_RES_ID, videoResId);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Video file not found: " + videoFileName, Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     private void setupPlayerDropdown() {
         List<Player> players = PlayerDataManager.getInstance().getPlayerList();
