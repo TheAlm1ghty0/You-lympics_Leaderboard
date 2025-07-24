@@ -152,6 +152,7 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
         TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, weight);
         textView.setLayoutParams(params);
         textView.setText(text);
+        textView.setTextSize(18); // Increase font size for table data
         textView.setTextColor(getResources().getColor(android.R.color.white));
         textView.setGravity(Gravity.CENTER);
         return textView;

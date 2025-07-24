@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@android:color/white"
-                android:textSize="28sp"
+                android:textSize="34sp"
                 android:textStyle="bold"
                 tools:text="Callum" />
 
@@ -36,7 +36,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="8dp"
                 android:textColor="#4CAF50"
-                android:textSize="22sp"
+                android:textSize="26sp"
                 android:textStyle="bold"
                 tools:text="Total Points: 100" />
 
@@ -85,6 +85,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="2"
                         android:text="Event"
+                        android:textSize="16sp"
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
@@ -93,6 +94,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="Round 1"
+                        android:textSize="16sp"
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
@@ -101,6 +103,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="Round 2"
+                        android:textSize="16sp"
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
@@ -109,6 +112,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="Round 3"
+                        android:textSize="16sp"
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
                 </TableRow>

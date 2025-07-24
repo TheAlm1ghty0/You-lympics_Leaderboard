@@ -1,6 +1,7 @@
 package com.example.you_lympics_leaderboard;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
             populatePodium(playerList.get(1), R.id.container_2nd_place, R.id.imageView_2nd_avatar, R.id.textView_2nd_name, R.id.textView_2nd_points);
             populatePodium(playerList.get(2), R.id.container_3rd_place, R.id.imageView_3rd_avatar, R.id.textView_3rd_name, R.id.textView_3rd_points);
 
-            // Use the new submitList method to enable animations
+            // Use the correct method name 'submitList' to update the adapter
             adapterRest.submitList(playerList.subList(3, playerList.size()));
         }
     }
@@ -150,7 +151,14 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
                 .setTitle("Reset All Scores")
                 .setMessage("Are you sure you want to reset all scores and plane seats? This action cannot be undone.")
                 .setPositiveButton("Yes, Reset", (dialog, which) -> {
+                    // Reset the Firebase data
                     PlayerDataManager.getInstance().resetAllData();
+
+                    // Reset the local UI preferences for the checkboxes
+                    SharedPreferences uiPrefs = getSharedPreferences("YouLympicsUIPrefs", MODE_PRIVATE);
+                    uiPrefs.edit().clear().apply();
+
+                    // Show a confirmation message
                     Toast.makeText(this, "All scores have been reset.", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)

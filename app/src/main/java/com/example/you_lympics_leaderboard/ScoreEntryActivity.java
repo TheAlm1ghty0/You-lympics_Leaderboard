@@ -29,7 +29,6 @@ public class ScoreEntryActivity extends AppCompatActivity {
     private int eventNumber;
     private Player selectedPlayer;
 
-    // UI Components
     private AutoCompleteTextView playerAutoComplete;
     private ConstraintLayout scoreFieldsContainer;
     private LinearLayout round2Container, round3Container;
@@ -41,7 +40,8 @@ public class ScoreEntryActivity extends AppCompatActivity {
 
     private final List<String> eventNames = Arrays.asList(
             "Strawpedo", "Race 2 Pint", "Crab Run",
-            "Ping Pong Run", "Elimination Slaps", "Elimination Stacks"
+            "Ping Pong Run", "Elimination Slaps", "Elimination Stacks",
+            "Twist 1", "Twist 2"
     );
 
     @Override
@@ -120,7 +120,6 @@ public class ScoreEntryActivity extends AppCompatActivity {
 
     private void setupPlayerDropdown() {
         List<Player> players = PlayerDataManager.getInstance().getPlayerList();
-        // Sort the local copy of the list alphabetically by player name
         Collections.sort(players, (p1, p2) -> p1.getName().compareTo(p2.getName()));
 
         List<String> playerNames = new ArrayList<>();
@@ -135,23 +134,18 @@ public class ScoreEntryActivity extends AppCompatActivity {
             if (selectedPlayer != null) {
                 PlayerDataManager.getInstance().updatePlayer(selectedPlayer);
             }
-            // Get the player from the alphabetically sorted list
             selectedPlayer = players.get(position);
             updateUiForSelectedPlayer();
         });
     }
 
     private void setupCheckboxListeners() {
-        // Use SharedPreferences for UI state persistence
         SharedPreferences prefs = getSharedPreferences("YouLympicsUIPrefs", MODE_PRIVATE);
-
-        // Load the saved state, defaulting to false
         showRound2CheckBox.setChecked(prefs.getBoolean("round2_visible", false));
         showRound3CheckBox.setChecked(prefs.getBoolean("round3_visible", false));
         updateRoundVisibility();
 
         showRound2CheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // If Round 2 is unchecked, Round 3 must also be unchecked.
             if (!isChecked) {
                 showRound3CheckBox.setChecked(false);
             }
@@ -160,7 +154,6 @@ public class ScoreEntryActivity extends AppCompatActivity {
         });
 
         showRound3CheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // If Round 3 is checked, Round 2 must also be checked.
             if (isChecked) {
                 showRound2CheckBox.setChecked(true);
             }
@@ -180,44 +173,49 @@ public class ScoreEntryActivity extends AppCompatActivity {
     private void updateUiForSelectedPlayer() {
         if (selectedPlayer == null) return;
 
-        scoreFieldsContainer.setVisibility(View.VISIBLE);
-        updateRoundVisibility();
-
-        if (r1Watcher != null) round1EditText.removeTextChangedListener(r1Watcher);
-        if (r2Watcher != null) round2EditText.removeTextChangedListener(r2Watcher);
-        if (r3Watcher != null) round3EditText.removeTextChangedListener(r3Watcher);
-
-        if (eventNumber <= 4) { // Timed
-            configureEditText(round1EditText, "SS.ms", false);
-            configureEditText(round2EditText, "SS.ms", false);
-            configureEditText(round3EditText, "SS.ms", false);
-        } else { // Positional
-            configureEditText(round1EditText, "1-10", true);
-            configureEditText(round2EditText, "1-10", true);
-            configureEditText(round3EditText, "1-10", true);
-        }
-
-        String r1Score = selectedPlayer.getScore(1, eventNumber);
-        String r2Score = selectedPlayer.getScore(2, eventNumber);
-        String r3Score = selectedPlayer.getScore(3, eventNumber);
-
-        if (eventNumber <= 4) {
-            round1EditText.setText(r1Score.equals("0.0") ? "" : r1Score);
-            round2EditText.setText(r2Score.equals("0.0") ? "" : r2Score);
-            round3EditText.setText(r3Score.equals("0.0") ? "" : r3Score);
+        // For Twist events, only show video buttons, not score entry
+        if (eventNumber > 6) {
+            scoreFieldsContainer.setVisibility(View.GONE);
         } else {
-            round1EditText.setText(r1Score.equals("0") ? "" : r1Score);
-            round2EditText.setText(r2Score.equals("0") ? "" : r2Score);
-            round3EditText.setText(r3Score.equals("0") ? "" : r3Score);
+            scoreFieldsContainer.setVisibility(View.VISIBLE);
+            updateRoundVisibility();
+
+            if (r1Watcher != null) round1EditText.removeTextChangedListener(r1Watcher);
+            if (r2Watcher != null) round2EditText.removeTextChangedListener(r2Watcher);
+            if (r3Watcher != null) round3EditText.removeTextChangedListener(r3Watcher);
+
+            if (eventNumber <= 4) { // Timed
+                configureEditText(round1EditText, "SS.ms", false);
+                configureEditText(round2EditText, "SS.ms", false);
+                configureEditText(round3EditText, "SS.ms", false);
+            } else { // Positional
+                configureEditText(round1EditText, "1-10", true);
+                configureEditText(round2EditText, "1-10", true);
+                configureEditText(round3EditText, "1-10", true);
+            }
+
+            String r1Score = selectedPlayer.getScore(1, eventNumber);
+            String r2Score = selectedPlayer.getScore(2, eventNumber);
+            String r3Score = selectedPlayer.getScore(3, eventNumber);
+
+            if (eventNumber <= 4) {
+                round1EditText.setText(r1Score.equals("0.0") ? "" : r1Score);
+                round2EditText.setText(r2Score.equals("0.0") ? "" : r2Score);
+                round3EditText.setText(r3Score.equals("0.0") ? "" : r3Score);
+            } else {
+                round1EditText.setText(r1Score.equals("0") ? "" : r1Score);
+                round2EditText.setText(r2Score.equals("0") ? "" : r2Score);
+                round3EditText.setText(r3Score.equals("0") ? "" : r3Score);
+            }
+
+            r1Watcher = createTextWatcher(1);
+            r2Watcher = createTextWatcher(2);
+            r3Watcher = createTextWatcher(3);
+
+            round1EditText.addTextChangedListener(r1Watcher);
+            round2EditText.addTextChangedListener(r2Watcher);
+            round3EditText.addTextChangedListener(r3Watcher);
         }
-
-        r1Watcher = createTextWatcher(1);
-        r2Watcher = createTextWatcher(2);
-        r3Watcher = createTextWatcher(3);
-
-        round1EditText.addTextChangedListener(r1Watcher);
-        round2EditText.addTextChangedListener(r2Watcher);
-        round3EditText.addTextChangedListener(r3Watcher);
     }
 
     private void updateRoundVisibility() {

@@ -54,7 +54,7 @@
         android:id="@+id/score_fields_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="60dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -96,7 +96,7 @@
             android:id="@+id/container_round2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="80dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="gone"
@@ -129,7 +129,7 @@
             android:id="@+id/container_round3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="80dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="gone"
@@ -173,14 +173,14 @@
             android:id="@+id/button_video1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Video 1"
+            android:text="Intro"
             android:layout_marginEnd="8dp"/>
 
         <Button
             android:id="@+id/button_video2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Video 2"
+            android:text="Title"
             android:layout_marginStart="8dp"/>
     </LinearLayout>
 
