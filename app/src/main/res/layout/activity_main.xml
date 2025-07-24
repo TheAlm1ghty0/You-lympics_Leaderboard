@@ -38,13 +38,27 @@
                     android:orientation="vertical"
                     android:padding="8dp">
 
-                    <TextView
-                        android:id="@+id/textView_2nd_name"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@android:color/white"
-                        android:textSize="18sp"
-                        tools:text="Carrie" />
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/imageView_2nd_avatar"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginBottom="4dp"
+                            tools:src="@android:drawable/sym_def_app_icon"/>
+
+                        <TextView
+                            android:id="@+id/textView_2nd_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/white"
+                            android:textSize="18sp"
+                            tools:text="Carrie" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/textView_2nd_points"
@@ -83,14 +97,28 @@
                     android:orientation="vertical"
                     android:padding="8dp">
 
-                    <TextView
-                        android:id="@+id/textView_1st_name"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@android:color/white"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        tools:text="Callum" />
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/imageView_1st_avatar"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginBottom="4dp"
+                            tools:src="@android:drawable/sym_def_app_icon"/>
+
+                        <TextView
+                            android:id="@+id/textView_1st_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            tools:text="Callum" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/textView_1st_points"
@@ -129,13 +157,27 @@
                     android:orientation="vertical"
                     android:padding="8dp">
 
-                    <TextView
-                        android:id="@+id/textView_3rd_name"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@android:color/white"
-                        android:textSize="18sp"
-                        tools:text="Charlotte" />
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/imageView_3rd_avatar"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginBottom="4dp"
+                            tools:src="@android:drawable/sym_def_app_icon"/>
+
+                        <TextView
+                            android:id="@+id/textView_3rd_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/white"
+                            android:textSize="18sp"
+                            tools:text="Charlotte" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/textView_3rd_points"

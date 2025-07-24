@@ -1,9 +1,12 @@
 package com.example.you_lympics_leaderboard;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -14,12 +17,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ScoreEntryActivity extends AppCompatActivity {
@@ -55,13 +57,21 @@ public class ScoreEntryActivity extends AppCompatActivity {
         setupVideoButtons();
 
         Button saveButton = findViewById(R.id.button_save_scores);
-        saveButton.setOnClickListener(v -> finish());
+        saveButton.setOnClickListener(v -> {
+            if (selectedPlayer != null) {
+                PlayerDataManager.getInstance().updatePlayer(selectedPlayer);
+                Toast.makeText(this, "Saving scores for " + selectedPlayer.getName(), Toast.LENGTH_SHORT).show();
+            }
+            finish();
+        });
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        PlayerDataManager.getInstance().saveData(this);
+        if (selectedPlayer != null) {
+            PlayerDataManager.getInstance().updatePlayer(selectedPlayer);
+        }
     }
 
     private void findViews() {
@@ -110,6 +120,9 @@ public class ScoreEntryActivity extends AppCompatActivity {
 
     private void setupPlayerDropdown() {
         List<Player> players = PlayerDataManager.getInstance().getPlayerList();
+        // Sort the local copy of the list alphabetically by player name
+        Collections.sort(players, (p1, p2) -> p1.getName().compareTo(p2.getName()));
+
         List<String> playerNames = new ArrayList<>();
         for (Player p : players) {
             playerNames.add(p.getName());
@@ -119,28 +132,49 @@ public class ScoreEntryActivity extends AppCompatActivity {
         playerAutoComplete.setAdapter(adapter);
 
         playerAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            if (selectedPlayer != null) {
+                PlayerDataManager.getInstance().updatePlayer(selectedPlayer);
+            }
+            // Get the player from the alphabetically sorted list
             selectedPlayer = players.get(position);
             updateUiForSelectedPlayer();
         });
     }
 
     private void setupCheckboxListeners() {
-        boolean r2Visible = PlayerDataManager.getInstance().isRound2Visible();
-        boolean r3Visible = PlayerDataManager.getInstance().isRound3Visible();
+        // Use SharedPreferences for UI state persistence
+        SharedPreferences prefs = getSharedPreferences("YouLympicsUIPrefs", MODE_PRIVATE);
 
-        showRound2CheckBox.setChecked(r2Visible);
-        showRound3CheckBox.setChecked(r3Visible);
+        // Load the saved state, defaulting to false
+        showRound2CheckBox.setChecked(prefs.getBoolean("round2_visible", false));
+        showRound3CheckBox.setChecked(prefs.getBoolean("round3_visible", false));
         updateRoundVisibility();
 
         showRound2CheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            PlayerDataManager.getInstance().setRound2Visible(isChecked);
+            // If Round 2 is unchecked, Round 3 must also be unchecked.
+            if (!isChecked) {
+                showRound3CheckBox.setChecked(false);
+            }
+            saveCheckboxState();
             updateRoundVisibility();
         });
 
         showRound3CheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            PlayerDataManager.getInstance().setRound3Visible(isChecked);
+            // If Round 3 is checked, Round 2 must also be checked.
+            if (isChecked) {
+                showRound2CheckBox.setChecked(true);
+            }
+            saveCheckboxState();
             updateRoundVisibility();
         });
+    }
+
+    private void saveCheckboxState() {
+        SharedPreferences prefs = getSharedPreferences("YouLympicsUIPrefs", MODE_PRIVATE);
+        prefs.edit()
+                .putBoolean("round2_visible", showRound2CheckBox.isChecked())
+                .putBoolean("round3_visible", showRound3CheckBox.isChecked())
+                .apply();
     }
 
     private void updateUiForSelectedPlayer() {
@@ -154,18 +188,28 @@ public class ScoreEntryActivity extends AppCompatActivity {
         if (r3Watcher != null) round3EditText.removeTextChangedListener(r3Watcher);
 
         if (eventNumber <= 4) { // Timed
-            configureEditText(round1EditText, "MM:SS");
-            configureEditText(round2EditText, "MM:SS");
-            configureEditText(round3EditText, "MM:SS");
+            configureEditText(round1EditText, "SS.ms", false);
+            configureEditText(round2EditText, "SS.ms", false);
+            configureEditText(round3EditText, "SS.ms", false);
         } else { // Positional
-            configureEditText(round1EditText, "1-10");
-            configureEditText(round2EditText, "1-10");
-            configureEditText(round3EditText, "1-10");
+            configureEditText(round1EditText, "1-10", true);
+            configureEditText(round2EditText, "1-10", true);
+            configureEditText(round3EditText, "1-10", true);
         }
 
-        round1EditText.setText(selectedPlayer.getScore(1, eventNumber));
-        round2EditText.setText(selectedPlayer.getScore(2, eventNumber));
-        round3EditText.setText(selectedPlayer.getScore(3, eventNumber));
+        String r1Score = selectedPlayer.getScore(1, eventNumber);
+        String r2Score = selectedPlayer.getScore(2, eventNumber);
+        String r3Score = selectedPlayer.getScore(3, eventNumber);
+
+        if (eventNumber <= 4) {
+            round1EditText.setText(r1Score.equals("0.0") ? "" : r1Score);
+            round2EditText.setText(r2Score.equals("0.0") ? "" : r2Score);
+            round3EditText.setText(r3Score.equals("0.0") ? "" : r3Score);
+        } else {
+            round1EditText.setText(r1Score.equals("0") ? "" : r1Score);
+            round2EditText.setText(r2Score.equals("0") ? "" : r2Score);
+            round3EditText.setText(r3Score.equals("0") ? "" : r3Score);
+        }
 
         r1Watcher = createTextWatcher(1);
         r2Watcher = createTextWatcher(2);
@@ -177,16 +221,21 @@ public class ScoreEntryActivity extends AppCompatActivity {
     }
 
     private void updateRoundVisibility() {
-        round2Container.setVisibility(showRound2CheckBox.isChecked() ? View.VISIBLE : View.GONE);
-        round3Container.setVisibility(showRound3CheckBox.isChecked() ? View.VISIBLE : View.GONE);
+        boolean r2Checked = showRound2CheckBox.isChecked();
+        boolean r3Checked = showRound3CheckBox.isChecked();
+
+        round2Container.setVisibility(r2Checked ? View.VISIBLE : View.GONE);
+        round3Container.setVisibility(r2Checked && r3Checked ? View.VISIBLE : View.GONE);
     }
 
-    private void configureEditText(EditText editText, String hint) {
+    private void configureEditText(EditText editText, String hint, boolean isPositional) {
         editText.setHint(hint);
-        if (eventNumber <= 4) {
-            editText.setInputType(InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_TIME);
-        } else {
+        if (isPositional) {
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+            editText.setFilters(new InputFilter[]{new InputFilterMinMax(1, 10)});
+        } else {
+            editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            editText.setFilters(new InputFilter[]{});
         }
     }
 
@@ -203,5 +252,35 @@ public class ScoreEntryActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private static class InputFilterMinMax implements InputFilter {
+        private final int min;
+        private final int max;
+
+        public InputFilterMinMax(int min, int max) {
+            this.min = min;
+            this.max = max;
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            try {
+                String newVal = dest.subSequence(0, dstart).toString() + source.subSequence(start, end) + dest.subSequence(dend, dest.length());
+                if (newVal.isEmpty()) {
+                    return null;
+                }
+                int input = Integer.parseInt(newVal);
+                if (isInRange(min, max, input)) {
+                    return null;
+                }
+            } catch (NumberFormatException nfe) {
+            }
+            return "";
+        }
+
+        private boolean isInRange(int a, int b, int c) {
+            return b > a ? c >= a && c <= b : c >= b && c <= a;
+        }
     }
 }

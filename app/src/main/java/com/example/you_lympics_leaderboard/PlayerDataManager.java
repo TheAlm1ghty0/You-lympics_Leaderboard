@@ -1,128 +1,132 @@
 package com.example.you_lympics_leaderboard;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
+import android.util.Log;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PlayerDataManager {
 
+    private static final String TAG = "PlayerDataManager";
     private static PlayerDataManager instance;
-    private List<Player> playerList;
-
-    // New fields to store checkbox visibility
-    private boolean round2Visible = false;
-    private boolean round3Visible = false;
-
-    private static final String PREFS_NAME = "YouLympicsPrefs";
-    private static final String PLAYERS_KEY = "PlayerList";
-    private static final String R2_VISIBLE_KEY = "Round2Visible";
-    private static final String R3_VISIBLE_KEY = "Round3Visible";
-
+    private final List<Player> playerList = new CopyOnWriteArrayList<>();
+    private final FirebaseFirestore db;
+    private ListenerRegistration listenerRegistration;
+    private final List<PlayerDataListener> listeners = new CopyOnWriteArrayList<>();
 
     private static final List<String> PLAYER_NAMES = Arrays.asList(
             "Callum", "Carrie", "Charlotte", "Conor", "Dave",
             "Jamie", "Joel", "Oscar", "Peter", "Tim"
     );
 
-    private PlayerDataManager(Context context) {
-        loadData(context);
-    }
-
-    public static synchronized PlayerDataManager getInstance(Context context) {
-        if (instance == null) {
-            instance = new PlayerDataManager(context.getApplicationContext());
-        }
-        return instance;
+    private PlayerDataManager() {
+        db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
+                .build();
+        db.setFirestoreSettings(settings);
+        startListeningForUpdates();
     }
 
     public static synchronized PlayerDataManager getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("PlayerDataManager is not initialized, call getInstance(Context) first.");
+            instance = new PlayerDataManager();
         }
         return instance;
     }
 
-    public List<Player> getPlayerList() {
-        return playerList;
+    public void addListener(PlayerDataListener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+        if (!playerList.isEmpty()) {
+            listener.onDataUpdated(new ArrayList<>(playerList));
+        }
     }
 
-    public Player getPlayer(int position) {
-        if (position >= 0 && position < playerList.size()) {
-            return playerList.get(position);
+    public void removeListener(PlayerDataListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void startListeningForUpdates() {
+        CollectionReference playersCollection = db.collection("players");
+        listenerRegistration = playersCollection.addSnapshotListener((snapshots, e) -> {
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e);
+                return;
+            }
+
+            if (snapshots != null && !snapshots.isEmpty()) {
+                playerList.clear();
+                for (int i = 0; i < snapshots.getDocuments().size(); i++) {
+                    Player player = snapshots.getDocuments().get(i).toObject(Player.class);
+                    if (player != null) {
+                        player.setId(snapshots.getDocuments().get(i).getId());
+                        playerList.add(player);
+                    }
+                }
+                Log.d(TAG, "Data updated from Firestore. Players: " + playerList.size());
+                for (PlayerDataListener listener : listeners) {
+                    listener.onDataUpdated(new ArrayList<>(playerList));
+                }
+            } else {
+                Log.d(TAG, "No data found in Firestore, creating initial data...");
+                createInitialData();
+            }
+        });
+    }
+
+    private void createInitialData() {
+        CollectionReference playersCollection = db.collection("players");
+        for (String name : PLAYER_NAMES) {
+            Player player = new Player(name);
+            player.calculateTotalPoints();
+            playersCollection.add(player);
+        }
+    }
+
+    public void updatePlayer(Player player) {
+        if (player != null && player.getId() != null) {
+            player.calculateTotalPoints();
+            db.collection("players").document(player.getId()).set(player)
+                    .addOnFailureListener(err -> Log.w(TAG, "Error updating player", err));
+        }
+    }
+
+    public void resetAllData() {
+        for (Player player : playerList) {
+            Player freshPlayer = new Player(player.getName());
+            freshPlayer.setId(player.getId());
+            freshPlayer.calculateTotalPoints();
+            updatePlayer(freshPlayer);
+        }
+    }
+
+    public Player getPlayerById(String id) {
+        for (Player p : playerList) {
+            if (p.getId() != null && p.getId().equals(id)) {
+                return p;
+            }
         }
         return null;
     }
 
-    // --- Getters and Setters for Visibility ---
-    public boolean isRound2Visible() {
-        return round2Visible;
+    public List<Player> getPlayerList() {
+        return new ArrayList<>(playerList);
     }
 
-    public void setRound2Visible(boolean round2Visible) {
-        this.round2Visible = round2Visible;
-    }
-
-    public boolean isRound3Visible() {
-        return round3Visible;
-    }
-
-    public void setRound3Visible(boolean round3Visible) {
-        this.round3Visible = round3Visible;
-    }
-
-
-    public void saveData(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(playerList);
-        editor.putString(PLAYERS_KEY, json);
-
-        // Save the visibility states
-        editor.putBoolean(R2_VISIBLE_KEY, round2Visible);
-        editor.putBoolean(R3_VISIBLE_KEY, round3Visible);
-
-        editor.apply();
-    }
-
-    private void loadData(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(PLAYERS_KEY, null);
-
-        if (json != null) {
-            Type type = new TypeToken<ArrayList<Player>>() {}.getType();
-            playerList = gson.fromJson(json, type);
-            // Load visibility states, defaulting to false if not found
-            round2Visible = prefs.getBoolean(R2_VISIBLE_KEY, false);
-            round3Visible = prefs.getBoolean(R3_VISIBLE_KEY, false);
-        } else {
-            playerList = new ArrayList<>();
-            for (String name : PLAYER_NAMES) {
-                playerList.add(new Player(name));
-            }
-            // Ensure visibility is false on first launch
-            round2Visible = false;
-            round3Visible = false;
+    public void stopListening() {
+        if (listenerRegistration != null) {
+            listenerRegistration.remove();
         }
     }
 
-    public void resetAllData(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.clear();
-        editor.apply();
-        loadData(context);
-    }
-
-    public void calculateAllPlayerPoints() {
-        for (Player player : playerList) {
-            player.calculateTotalPoints();
-        }
+    public interface PlayerDataListener {
+        void onDataUpdated(List<Player> players);
     }
 }

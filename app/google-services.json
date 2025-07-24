@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "847252947017",
+    "project_id": "you-lympics-leaderboard",
+    "storage_bucket": "you-lympics-leaderboard.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847252947017:android:91c11eda2cd309dcc0ff98",
+        "android_client_info": {
+          "package_name": "com.example.you_lympics_leaderboard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRUj-fPrWghHvUiUxzKyvNjsleyQuErRU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
