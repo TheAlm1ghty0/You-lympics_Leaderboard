@@ -1,9 +1,7 @@
-package com.example.you_lympics_leaderboard;
+package com.Kohnqueror.you_lympics_leaderboard;
 
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import java.util.List;
-import java.util.Objects;
 
 public class PlayerDiffCallback extends DiffUtil.Callback {
 

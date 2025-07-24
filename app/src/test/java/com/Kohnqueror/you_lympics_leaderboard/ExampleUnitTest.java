@@ -1,4 +1,4 @@
-package com.example.you_lympics_leaderboard;
+package com.Kohnqueror.you_lympics_leaderboard;
 
 import org.junit.Test;
 

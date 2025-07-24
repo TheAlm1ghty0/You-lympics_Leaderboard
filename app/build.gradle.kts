@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.you_lympics_leaderboard"
+    namespace = "com.Kohnqueror.you_lympics_leaderboard"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.you_lympics_leaderboard"
+        applicationId = "com.Kohnqueror.you_lympics_leaderboard"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

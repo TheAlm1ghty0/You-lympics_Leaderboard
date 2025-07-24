@@ -1,6 +1,5 @@
-package com.example.you_lympics_leaderboard;
+package com.Kohnqueror.you_lympics_leaderboard;
 
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
