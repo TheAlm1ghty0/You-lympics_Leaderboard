@@ -2,7 +2,6 @@ package com.Kohnqueror.you_lympics_leaderboard;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -12,14 +11,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
     private ImageButton menuButton;
     private PlayerAdapter adapterRest;
     private RecyclerView recyclerViewRest;
+    private ImageView connectionStatusIcon;
+    private CoordinatorLayout coordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
         recyclerViewRest.setAdapter(adapterRest);
 
         menuButton = findViewById(R.id.button_menu);
+        connectionStatusIcon = findViewById(R.id.imageView_connection_status);
+        coordinatorLayout = findViewById(R.id.coordinator_layout);
         menuButton.setOnClickListener(this::showMenuPopup);
     }
 
@@ -65,7 +70,10 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
     @Override
     public void onDataUpdated(List<Player> players) {
         this.playerList = players;
-        runOnUiThread(this::setupLeaderboard);
+        runOnUiThread(() -> {
+            connectionStatusIcon.setImageResource(R.drawable.ic_status_connected);
+            setupLeaderboard();
+        });
     }
 
     @Override
@@ -159,23 +167,27 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_tournament_settings, null);
 
-        SwitchMaterial switchRound2 = dialogView.findViewById(R.id.switch_lock_round2);
-        SwitchMaterial switchRound3 = dialogView.findViewById(R.id.switch_lock_round3);
-
-        // Set initial state from loaded settings
-        switchRound2.setChecked(!tournamentSettings.isRound2Locked());
-        switchRound3.setChecked(!tournamentSettings.isRound3Locked());
+        RadioGroup radioGroup = dialogView.findViewById(R.id.radioGroup_rounds);
+        if (tournamentSettings.getCurrentRound() == 1) {
+            radioGroup.check(R.id.radioButton_round1);
+        } else if (tournamentSettings.getCurrentRound() == 2) {
+            radioGroup.check(R.id.radioButton_round2);
+        } else {
+            radioGroup.check(R.id.radioButton_round3);
+        }
 
         new AlertDialog.Builder(this)
                 .setTitle("Tournament Settings")
                 .setView(dialogView)
                 .setPositiveButton("Save", (dialog, which) -> {
-                    boolean round2Unlocked = switchRound2.isChecked();
-                    boolean round3Unlocked = switchRound3.isChecked();
-
-                    tournamentSettings.setRound2Locked(!round2Unlocked);
-                    tournamentSettings.setRound3Locked(!round3Unlocked);
-
+                    int selectedId = radioGroup.getCheckedRadioButtonId();
+                    int newRound = 1;
+                    if (selectedId == R.id.radioButton_round2) {
+                        newRound = 2;
+                    } else if (selectedId == R.id.radioButton_round3) {
+                        newRound = 3;
+                    }
+                    tournamentSettings.setCurrentRound(newRound);
                     PlayerDataManager.getInstance().updateTournamentSettings(tournamentSettings);
                     Toast.makeText(this, "Settings saved.", Toast.LENGTH_SHORT).show();
                 })
@@ -188,8 +200,18 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
                 .setTitle("Reset All Scores")
                 .setMessage("Are you sure you want to reset all scores and plane seats? This action cannot be undone.")
                 .setPositiveButton("Yes, Reset", (dialog, which) -> {
+                    final List<Player> playersToRestore = new ArrayList<>(playerList);
+                    final TournamentSettings settingsToRestore = tournamentSettings;
+
                     PlayerDataManager.getInstance().resetAllData();
-                    Toast.makeText(this, "All scores have been reset.", Toast.LENGTH_SHORT).show();
+
+                    Snackbar.make(coordinatorLayout, "All scores have been reset.", Snackbar.LENGTH_LONG)
+                            .setAction("UNDO", v -> {
+                                PlayerDataManager.getInstance().restorePlayers(playersToRestore);
+                                PlayerDataManager.getInstance().updateTournamentSettings(settingsToRestore);
+                                Toast.makeText(MainActivity.this, "Reset undone.", Toast.LENGTH_SHORT).show();
+                            })
+                            .show();
                 })
                 .setNegativeButton("Cancel", null)
                 .setIcon(android.R.drawable.ic_dialog_alert)

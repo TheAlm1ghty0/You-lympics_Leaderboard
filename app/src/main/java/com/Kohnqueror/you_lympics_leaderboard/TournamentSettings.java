@@ -1,28 +1,24 @@
 package com.Kohnqueror.you_lympics_leaderboard;
 
-/**
- * A data model for storing global tournament settings in Firestore.
- */
 public class TournamentSettings {
-    private boolean round2Locked = true; // Default to locked
-    private boolean round3Locked = true; // Default to locked
+    private int currentRound = 1; // Can be 1, 2, or 3
 
-    // Public no-argument constructor is required for Firestore
     public TournamentSettings() {}
 
-    public boolean isRound2Locked() {
-        return round2Locked;
+    public int getCurrentRound() {
+        return currentRound;
     }
 
-    public void setRound2Locked(boolean round2Locked) {
-        this.round2Locked = round2Locked;
+    public void setCurrentRound(int currentRound) {
+        this.currentRound = currentRound;
+    }
+
+    // These methods are needed for the Stopwatch app
+    public boolean isRound2Locked() {
+        return currentRound < 2;
     }
 
     public boolean isRound3Locked() {
-        return round3Locked;
-    }
-
-    public void setRound3Locked(boolean round3Locked) {
-        this.round3Locked = round3Locked;
+        return currentRound < 3;
     }
 }

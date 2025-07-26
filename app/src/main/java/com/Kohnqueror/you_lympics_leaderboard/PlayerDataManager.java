@@ -47,7 +47,6 @@ public class PlayerDataManager {
         if (!listeners.contains(listener)) {
             listeners.add(listener);
         }
-        // Immediately notify with current data if available
         if (!playerList.isEmpty()) {
             listener.onDataUpdated(new ArrayList<>(playerList));
         }
@@ -93,7 +92,6 @@ public class PlayerDataManager {
             if (snapshot != null && snapshot.exists()) {
                 tournamentSettings = snapshot.toObject(TournamentSettings.class);
             } else {
-                // If settings don't exist, create them with defaults (locked)
                 tournamentSettings = new TournamentSettings();
                 updateTournamentSettings(tournamentSettings);
             }
@@ -142,15 +140,19 @@ public class PlayerDataManager {
         }
     }
 
+    public void restorePlayers(List<Player> playersToRestore) {
+        for (Player player : playersToRestore) {
+            updatePlayer(player);
+        }
+    }
+
     public void resetAllData() {
-        // Reset players
         for (Player player : playerList) {
             Player freshPlayer = new Player(player.getName());
             freshPlayer.setId(player.getId());
             freshPlayer.calculateTotalPoints();
             updatePlayer(freshPlayer);
         }
-        // Reset settings to default (locked)
         updateTournamentSettings(new TournamentSettings());
     }
 

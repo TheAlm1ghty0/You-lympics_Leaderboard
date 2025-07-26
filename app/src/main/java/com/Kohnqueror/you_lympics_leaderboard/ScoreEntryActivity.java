@@ -31,7 +31,6 @@ public class ScoreEntryActivity extends AppCompatActivity implements PlayerDataM
     private TournamentSettings tournamentSettings;
     private List<Player> sortedPlayerList;
 
-    // UI Components
     private AutoCompleteTextView playerAutoComplete;
     private TextInputLayout playerSelectLayout; // Added for focus clearing
     private ConstraintLayout scoreFieldsContainer;
@@ -52,7 +51,6 @@ public class ScoreEntryActivity extends AppCompatActivity implements PlayerDataM
         setContentView(R.layout.activity_score_entry);
 
         eventNumber = getIntent().getIntExtra("EVENT_NUMBER", 0);
-
         findViews();
         setupVideoButtons();
 

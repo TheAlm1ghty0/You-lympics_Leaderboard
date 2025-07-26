@@ -1,10 +1,12 @@
 package com.Kohnqueror.you_lympics_leaderboard;
 
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class VideoPlayerActivity extends AppCompatActivity {
 
     public static final String VIDEO_RES_ID = "VIDEO_RES_ID";
+    public static final String WINNER_NAME = "WINNER_NAME";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +23,15 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
         VideoView videoView = findViewById(R.id.videoView);
         ProgressBar progressBar = findViewById(R.id.progressBar);
+        TextView congratsTextView = findViewById(R.id.textView_congratulations);
 
         int videoResId = getIntent().getIntExtra(VIDEO_RES_ID, -1);
+        String winnerName = getIntent().getStringExtra(WINNER_NAME);
+
+        if (winnerName != null && !winnerName.isEmpty()) {
+            congratsTextView.setText("Congratulations, " + winnerName + "!");
+            congratsTextView.setVisibility(View.VISIBLE);
+        }
 
         if (videoResId == -1) {
             Toast.makeText(this, "Error: Video not found.", Toast.LENGTH_SHORT).show();
@@ -52,11 +62,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Handles the click for the new back button.
-     * It closes the current activity, returning to the score entry screen.
-     * @param view The button that was clicked.
-     */
     public void onBackToEventClick(View view) {
         finish();
     }
