@@ -20,7 +20,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Modern Dropdown using Material Components with our custom style -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/player_select_layout"
         style="@style/CustomExposedDropdownMenu"
@@ -158,14 +157,14 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Container for the new video buttons -->
+    <!-- Container for the video buttons -->
     <LinearLayout
         android:id="@+id/video_buttons_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/score_fields_container"
-        app:layout_constraintBottom_toTopOf="@id/visibility_controls_container"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/button_save_scores"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -183,35 +182,6 @@
             android:text="Title"
             android:layout_marginStart="8dp"/>
     </LinearLayout>
-
-    <!-- Container for the visibility checkboxes -->
-    <LinearLayout
-        android:id="@+id/visibility_controls_container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@id/button_save_scores"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <CheckBox
-            android:id="@+id/checkbox_show_round2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="Show Round 2"
-            android:textColor="@android:color/white" />
-
-        <CheckBox
-            android:id="@+id/checkbox_show_round3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Show Round 3"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
-
 
     <Button
         android:id="@+id/button_save_scores"

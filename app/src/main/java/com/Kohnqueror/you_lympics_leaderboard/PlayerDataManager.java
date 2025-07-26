@@ -2,6 +2,7 @@ package com.Kohnqueror.you_lympics_leaderboard;
 
 import android.util.Log;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -15,8 +16,10 @@ public class PlayerDataManager {
     private static final String TAG = "PlayerDataManager";
     private static PlayerDataManager instance;
     private final List<Player> playerList = new CopyOnWriteArrayList<>();
+    private TournamentSettings tournamentSettings = new TournamentSettings();
     private final FirebaseFirestore db;
-    private ListenerRegistration listenerRegistration;
+    private ListenerRegistration playerListenerReg;
+    private ListenerRegistration settingsListenerReg;
     private final List<PlayerDataListener> listeners = new CopyOnWriteArrayList<>();
 
     private static final List<String> PLAYER_NAMES = Arrays.asList(
@@ -44,8 +47,12 @@ public class PlayerDataManager {
         if (!listeners.contains(listener)) {
             listeners.add(listener);
         }
+        // Immediately notify with current data if available
         if (!playerList.isEmpty()) {
             listener.onDataUpdated(new ArrayList<>(playerList));
+        }
+        if (tournamentSettings != null) {
+            listener.onSettingsUpdated(tournamentSettings);
         }
     }
 
@@ -54,13 +61,13 @@ public class PlayerDataManager {
     }
 
     private void startListeningForUpdates() {
+        // --- Listener for Players ---
         CollectionReference playersCollection = db.collection("players");
-        listenerRegistration = playersCollection.addSnapshotListener((snapshots, e) -> {
+        playerListenerReg = playersCollection.addSnapshotListener((snapshots, e) -> {
             if (e != null) {
-                Log.w(TAG, "Listen failed.", e);
+                Log.w(TAG, "Player listen failed.", e);
                 return;
             }
-
             if (snapshots != null && !snapshots.isEmpty()) {
                 playerList.clear();
                 for (int i = 0; i < snapshots.getDocuments().size(); i++) {
@@ -70,15 +77,52 @@ public class PlayerDataManager {
                         playerList.add(player);
                     }
                 }
-                Log.d(TAG, "Data updated from Firestore. Players: " + playerList.size());
-                for (PlayerDataListener listener : listeners) {
-                    listener.onDataUpdated(new ArrayList<>(playerList));
-                }
+                notifyDataListeners();
             } else {
-                Log.d(TAG, "No data found in Firestore, creating initial data...");
                 createInitialData();
             }
         });
+
+        // --- Listener for Settings ---
+        DocumentReference settingsDoc = db.collection("settings").document("tournament_config");
+        settingsListenerReg = settingsDoc.addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                Log.w(TAG, "Settings listen failed.", e);
+                return;
+            }
+            if (snapshot != null && snapshot.exists()) {
+                tournamentSettings = snapshot.toObject(TournamentSettings.class);
+            } else {
+                // If settings don't exist, create them with defaults (locked)
+                tournamentSettings = new TournamentSettings();
+                updateTournamentSettings(tournamentSettings);
+            }
+            notifySettingsListeners();
+        });
+    }
+
+    public void updateTournamentSettings(TournamentSettings settings) {
+        this.tournamentSettings = settings;
+        db.collection("settings").document("tournament_config").set(settings)
+                .addOnFailureListener(e -> Log.w(TAG, "Error updating settings", e));
+    }
+
+    public TournamentSettings getTournamentSettings() {
+        return tournamentSettings;
+    }
+
+    private void notifyDataListeners() {
+        for (PlayerDataListener listener : listeners) {
+            listener.onDataUpdated(new ArrayList<>(playerList));
+        }
+    }
+
+    private void notifySettingsListeners() {
+        if (tournamentSettings != null) {
+            for (PlayerDataListener listener : listeners) {
+                listener.onSettingsUpdated(tournamentSettings);
+            }
+        }
     }
 
     private void createInitialData() {
@@ -99,12 +143,15 @@ public class PlayerDataManager {
     }
 
     public void resetAllData() {
+        // Reset players
         for (Player player : playerList) {
             Player freshPlayer = new Player(player.getName());
             freshPlayer.setId(player.getId());
             freshPlayer.calculateTotalPoints();
             updatePlayer(freshPlayer);
         }
+        // Reset settings to default (locked)
+        updateTournamentSettings(new TournamentSettings());
     }
 
     public Player getPlayerById(String id) {
@@ -116,17 +163,8 @@ public class PlayerDataManager {
         return null;
     }
 
-    public List<Player> getPlayerList() {
-        return new ArrayList<>(playerList);
-    }
-
-    public void stopListening() {
-        if (listenerRegistration != null) {
-            listenerRegistration.remove();
-        }
-    }
-
     public interface PlayerDataListener {
         void onDataUpdated(List<Player> players);
+        void onSettingsUpdated(TournamentSettings settings);
     }
 }

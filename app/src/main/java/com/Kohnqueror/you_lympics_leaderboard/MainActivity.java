@@ -1,8 +1,9 @@
 package com.Kohnqueror.you_lympics_leaderboard;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -18,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +30,7 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity implements PlayerDataManager.PlayerDataListener {
 
     private List<Player> playerList = new ArrayList<>();
+    private TournamentSettings tournamentSettings;
     private ImageButton menuButton;
     private PlayerAdapter adapterRest;
     private RecyclerView recyclerViewRest;
@@ -65,18 +68,19 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
         runOnUiThread(this::setupLeaderboard);
     }
 
+    @Override
+    public void onSettingsUpdated(TournamentSettings settings) {
+        this.tournamentSettings = settings;
+    }
+
     private void setupLeaderboard() {
         Collections.sort(playerList, (p1, p2) -> {
             int pointsCompare = Integer.compare(p2.getTotalPoints(), p1.getTotalPoints());
-            if (pointsCompare != 0) {
-                return pointsCompare;
-            }
+            if (pointsCompare != 0) return pointsCompare;
             int seatValue1 = getSeatValue(p1.getPlaneSeat());
             int seatValue2 = getSeatValue(p2.getPlaneSeat());
             int seatCompare = Integer.compare(seatValue1, seatValue2);
-            if (seatCompare != 0) {
-                return seatCompare;
-            }
+            if (seatCompare != 0) return seatCompare;
             return p1.getName().compareTo(p2.getName());
         });
 
@@ -84,8 +88,6 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
             populatePodium(playerList.get(0), R.id.container_1st_place, R.id.imageView_1st_avatar, R.id.textView_1st_name, R.id.textView_1st_points);
             populatePodium(playerList.get(1), R.id.container_2nd_place, R.id.imageView_2nd_avatar, R.id.textView_2nd_name, R.id.textView_2nd_points);
             populatePodium(playerList.get(2), R.id.container_3rd_place, R.id.imageView_3rd_avatar, R.id.textView_3rd_name, R.id.textView_3rd_points);
-
-            // Use the correct method name 'submitList' to update the adapter
             adapterRest.submitList(playerList.subList(3, playerList.size()));
         }
     }
@@ -116,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
 
     private void showMenuPopup(View view) {
         ListPopupWindow listPopupWindow = new ListPopupWindow(this);
-        List<String> options = Arrays.asList("Edit Scores", "Reset All Scores");
+        List<String> options = Arrays.asList("Edit Scores", "Tournament Settings", "Reset All Scores");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_dropdown_item, options);
         listPopupWindow.setAdapter(adapter);
         listPopupWindow.setAnchorView(view);
@@ -127,9 +129,11 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
         listPopupWindow.setModal(true);
 
         listPopupWindow.setOnItemClickListener((parent, itemView, position, id) -> {
-            if (position == 0) {
+            if (position == 0) { // Edit Scores
                 startActivity(new Intent(MainActivity.this, EventsActivity.class));
-            } else if (position == 1) {
+            } else if (position == 1) { // Tournament Settings
+                showSettingsDialog();
+            } else if (position == 2) { // Reset All Scores
                 showResetConfirmationDialog();
             }
             listPopupWindow.dismiss();
@@ -146,19 +150,45 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
         listPopupWindow.show();
     }
 
+    private void showSettingsDialog() {
+        if (tournamentSettings == null) {
+            Toast.makeText(this, "Settings not loaded yet.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_tournament_settings, null);
+
+        SwitchMaterial switchRound2 = dialogView.findViewById(R.id.switch_lock_round2);
+        SwitchMaterial switchRound3 = dialogView.findViewById(R.id.switch_lock_round3);
+
+        // Set initial state from loaded settings
+        switchRound2.setChecked(!tournamentSettings.isRound2Locked());
+        switchRound3.setChecked(!tournamentSettings.isRound3Locked());
+
+        new AlertDialog.Builder(this)
+                .setTitle("Tournament Settings")
+                .setView(dialogView)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    boolean round2Unlocked = switchRound2.isChecked();
+                    boolean round3Unlocked = switchRound3.isChecked();
+
+                    tournamentSettings.setRound2Locked(!round2Unlocked);
+                    tournamentSettings.setRound3Locked(!round3Unlocked);
+
+                    PlayerDataManager.getInstance().updateTournamentSettings(tournamentSettings);
+                    Toast.makeText(this, "Settings saved.", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
     private void showResetConfirmationDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Reset All Scores")
                 .setMessage("Are you sure you want to reset all scores and plane seats? This action cannot be undone.")
                 .setPositiveButton("Yes, Reset", (dialog, which) -> {
-                    // Reset the Firebase data
                     PlayerDataManager.getInstance().resetAllData();
-
-                    // Reset the local UI preferences for the checkboxes
-                    SharedPreferences uiPrefs = getSharedPreferences("YouLympicsUIPrefs", MODE_PRIVATE);
-                    uiPrefs.edit().clear().apply();
-
-                    // Show a confirmation message
                     Toast.makeText(this, "All scores have been reset.", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)

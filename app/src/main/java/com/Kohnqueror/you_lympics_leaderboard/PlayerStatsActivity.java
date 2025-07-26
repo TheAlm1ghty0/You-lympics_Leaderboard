@@ -64,6 +64,12 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
         }
     }
 
+    @Override
+    public void onSettingsUpdated(TournamentSettings settings) {
+        // This screen does not need to react to settings changes,
+        // so we can leave this method empty.
+    }
+
     private void populatePlayerData() {
         if (player == null) return;
 
@@ -152,17 +158,11 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
         TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, weight);
         textView.setLayoutParams(params);
         textView.setText(text);
-        textView.setTextSize(18); // Increase font size for table data
         textView.setTextColor(getResources().getColor(android.R.color.white));
         textView.setGravity(Gravity.CENTER);
         return textView;
     }
 
-    /**
-     * Handles the click for the new back button.
-     * It closes the current activity, returning to the previous one (MainActivity).
-     * @param view The button that was clicked.
-     */
     public void onBackButtonClick(View view) {
         finish();
     }
