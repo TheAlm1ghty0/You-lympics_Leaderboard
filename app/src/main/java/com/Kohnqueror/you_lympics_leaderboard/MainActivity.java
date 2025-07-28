@@ -2,11 +2,13 @@ package com.Kohnqueror.you_lympics_leaderboard;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
     private RecyclerView recyclerViewRest;
     private ImageView connectionStatusIcon;
     private CoordinatorLayout coordinatorLayout;
+    private Button showWinnerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +55,10 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
         menuButton = findViewById(R.id.button_menu);
         connectionStatusIcon = findViewById(R.id.imageView_connection_status);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
+        showWinnerButton = findViewById(R.id.button_show_winner);
+
         menuButton.setOnClickListener(this::showMenuPopup);
+        showWinnerButton.setOnClickListener(v -> showWinnerVideo());
     }
 
     @Override
@@ -98,6 +104,51 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
             populatePodium(playerList.get(2), R.id.container_3rd_place, R.id.imageView_3rd_avatar, R.id.textView_3rd_name, R.id.textView_3rd_points);
             adapterRest.submitList(playerList.subList(3, playerList.size()));
         }
+
+        checkWinnerButtonVisibility();
+    }
+
+    private void checkWinnerButtonVisibility() {
+        boolean allScoresEntered = true;
+        if (playerList.isEmpty()) {
+            allScoresEntered = false;
+        }
+
+        for (Player player : playerList) {
+            for (int event = 1; event <= 6; event++) {
+                for (int round = 1; round <= 3; round++) {
+                    String score = player.getScore(round, event); // Corrected getScore parameters
+                    // Correctly check for both default timed and positional scores
+                    if (score == null || score.equals("0") || score.equals("0.0")) {
+                        allScoresEntered = false;
+                        break;
+                    }
+                }
+                if (!allScoresEntered) break;
+            }
+            if (!allScoresEntered) break;
+        }
+
+        showWinnerButton.setVisibility(allScoresEntered ? View.VISIBLE : View.GONE);
+    }
+
+    private void showWinnerVideo() {
+        if (playerList.isEmpty()) return;
+
+        Player winner = playerList.get(0);
+        String winnerName = winner.getName();
+        String videoFileName = winnerName.toLowerCase() + "_winner"; // e.g., callum_winner.mp4
+
+        int videoResId = getResources().getIdentifier(videoFileName, "raw", getPackageName());
+
+        if (videoResId != 0) {
+            Intent intent = new Intent(this, VideoPlayerActivity.class);
+            intent.putExtra(VideoPlayerActivity.VIDEO_RES_ID, videoResId);
+            intent.putExtra(VideoPlayerActivity.WINNER_NAME, winnerName);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Winner video not found for " + winnerName, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void populatePodium(Player player, int containerId, int avatarId, int nameId, int pointsId) {
@@ -118,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements PlayerDataManager
         }
 
         container.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, PlayerStatsActivity.class);
+            Intent intent = new Intent(this, PlayerStatsActivity.class);
             intent.putExtra("PLAYER_ID", player.getId());
             startActivity(intent);
         });

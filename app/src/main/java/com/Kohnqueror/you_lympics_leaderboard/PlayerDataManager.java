@@ -165,6 +165,9 @@ public class PlayerDataManager {
         return null;
     }
 
+    public List<Player> getPlayerList() {
+        return new ArrayList<>(playerList);
+    }
     public interface PlayerDataListener {
         void onDataUpdated(List<Player> players);
         void onSettingsUpdated(TournamentSettings settings);

@@ -1,7 +1,8 @@
 package com.Kohnqueror.you_lympics_leaderboard;
 
 public class TournamentSettings {
-    private int currentRound = 1; // Can be 1, 2, or 3
+    private int currentRound = 1;
+    private String lastPlacePlayerName = ""; // New field to store the loser's name
 
     public TournamentSettings() {}
 
@@ -11,6 +12,14 @@ public class TournamentSettings {
 
     public void setCurrentRound(int currentRound) {
         this.currentRound = currentRound;
+    }
+
+    public String getLastPlacePlayerName() {
+        return lastPlacePlayerName;
+    }
+
+    public void setLastPlacePlayerName(String lastPlacePlayerName) {
+        this.lastPlacePlayerName = lastPlacePlayerName;
     }
 
     // These methods are needed for the Stopwatch app

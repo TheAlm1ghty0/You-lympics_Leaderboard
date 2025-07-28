@@ -17,9 +17,11 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
 
     private Player player;
     private String playerId;
+    private TournamentSettings tournamentSettings;
     private EditText planeSeatEditText;
     private TableLayout scoresTable;
     private TextWatcher planeSeatWatcher;
+    private TextView headerRound2, headerRound3;
 
     private final List<String> eventNames = Arrays.asList(
             "Strawpedo", "Race 2 Pint", "Crab Run",
@@ -34,6 +36,8 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
         playerId = getIntent().getStringExtra("PLAYER_ID");
         planeSeatEditText = findViewById(R.id.editText_plane_seat);
         scoresTable = findViewById(R.id.tableLayout_scores);
+        headerRound2 = findViewById(R.id.header_round2);
+        headerRound3 = findViewById(R.id.header_round3);
     }
 
     @Override
@@ -66,12 +70,25 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
 
     @Override
     public void onSettingsUpdated(TournamentSettings settings) {
-        // This screen does not need to react to settings changes,
-        // so we can leave this method empty.
+        this.tournamentSettings = settings;
+        // If player data is already loaded, refresh the view with the new settings
+        if (player != null) {
+            runOnUiThread(this::populatePlayerData);
+        }
     }
 
     private void populatePlayerData() {
         if (player == null) return;
+
+        // First, update column visibility based on settings
+        if (tournamentSettings != null) {
+            headerRound2.setVisibility(tournamentSettings.isRound2Locked() ? View.GONE : View.VISIBLE);
+            headerRound3.setVisibility(tournamentSettings.isRound3Locked() ? View.GONE : View.VISIBLE);
+        } else {
+            // Default to hidden if settings haven't loaded yet
+            headerRound2.setVisibility(View.GONE);
+            headerRound3.setVisibility(View.GONE);
+        }
 
         TextView playerNameTextView = findViewById(R.id.textView_stats_playerName);
         TextView totalPointsTextView = findViewById(R.id.textView_stats_totalPoints);
@@ -116,13 +133,21 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
 
             TextView eventName = createTableCell(eventNames.get(i), 2);
             TextView round1ScoreView = createTableCell(r1Score, 1);
-            TextView round2ScoreView = createTableCell(r2Score, 1);
-            TextView round3ScoreView = createTableCell(r3Score, 1);
 
             row.addView(eventName);
             row.addView(round1ScoreView);
-            row.addView(round2ScoreView);
-            row.addView(round3ScoreView);
+
+            // Only add Round 2 if it's not locked
+            if (tournamentSettings != null && !tournamentSettings.isRound2Locked()) {
+                TextView round2ScoreView = createTableCell(r2Score, 1);
+                row.addView(round2ScoreView);
+            }
+
+            // Only add Round 3 if it's not locked
+            if (tournamentSettings != null && !tournamentSettings.isRound3Locked()) {
+                TextView round3ScoreView = createTableCell(r3Score, 1);
+                row.addView(round3ScoreView);
+            }
 
             scoresTable.addView(row);
         }
@@ -158,6 +183,7 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
         TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, weight);
         textView.setLayoutParams(params);
         textView.setText(text);
+        textView.setTextSize(18);
         textView.setTextColor(getResources().getColor(android.R.color.white));
         textView.setGravity(Gravity.CENTER);
         return textView;
