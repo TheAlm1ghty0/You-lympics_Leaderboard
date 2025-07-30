@@ -13,8 +13,21 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        android.buildFeatures.buildConfig = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        //0 = ORIGINAL, 1 = WITTY, 2 = HYPE_MAN, 3 = DRY_ANALYTICS, 4 = FRIENDLY_RIVAL
+        buildConfigField("int", "AI_GEN", "1")
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("D:\\Onedrive\\Documents\\Android Signed APK Info\\Android KeyStore")
+            storePassword = "Rainbow,Cabbage44"
+            keyAlias = "kohnquerors-keys"
+            keyPassword = "Rainbow,Cabbage44"
+        }
     }
 
     buildTypes {
@@ -24,6 +37,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
             applicationVariants.all {
                 val variant = this
                 variant.outputs.all {
@@ -53,4 +67,5 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.analytics)
+    implementation(libs.volley)
 }
