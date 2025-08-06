@@ -1,4 +1,4 @@
-package com.Kohnqueror.you_lympics_leaderboard;
+package com.Kohnqueror.you_lympics_leaderboard; // or you_lympics_stopwatch
 
 import android.util.Log;
 import com.google.firebase.firestore.CollectionReference;
@@ -60,7 +60,6 @@ public class PlayerDataManager {
     }
 
     private void startListeningForUpdates() {
-        // --- Listener for Players ---
         CollectionReference playersCollection = db.collection("players");
         playerListenerReg = playersCollection.addSnapshotListener((snapshots, e) -> {
             if (e != null) {
@@ -82,7 +81,6 @@ public class PlayerDataManager {
             }
         });
 
-        // --- Listener for Settings ---
         DocumentReference settingsDoc = db.collection("settings").document("tournament_config");
         settingsListenerReg = settingsDoc.addSnapshotListener((snapshot, e) -> {
             if (e != null) {
@@ -99,16 +97,6 @@ public class PlayerDataManager {
         });
     }
 
-    public void updateTournamentSettings(TournamentSettings settings) {
-        this.tournamentSettings = settings;
-        db.collection("settings").document("tournament_config").set(settings)
-                .addOnFailureListener(e -> Log.w(TAG, "Error updating settings", e));
-    }
-
-    public TournamentSettings getTournamentSettings() {
-        return tournamentSettings;
-    }
-
     private void notifyDataListeners() {
         for (PlayerDataListener listener : listeners) {
             listener.onDataUpdated(new ArrayList<>(playerList));
@@ -123,12 +111,22 @@ public class PlayerDataManager {
         }
     }
 
+    public void updateTournamentSettings(TournamentSettings settings) {
+        this.tournamentSettings = settings;
+        db.collection("settings").document("tournament_config").set(settings)
+                .addOnFailureListener(e -> Log.w(TAG, "Error updating settings", e));
+    }
+
     private void createInitialData() {
         CollectionReference playersCollection = db.collection("players");
         for (String name : PLAYER_NAMES) {
             Player player = new Player(name);
+            // Use the player's name as the unique document ID
+            String playerId = name.toLowerCase();
+            player.setId(playerId);
             player.calculateTotalPoints();
-            playersCollection.add(player);
+            // Use .document(id).set(player) instead of .add(player)
+            playersCollection.document(playerId).set(player);
         }
     }
 
@@ -168,6 +166,7 @@ public class PlayerDataManager {
     public List<Player> getPlayerList() {
         return new ArrayList<>(playerList);
     }
+
     public interface PlayerDataListener {
         void onDataUpdated(List<Player> players);
         void onSettingsUpdated(TournamentSettings settings);
