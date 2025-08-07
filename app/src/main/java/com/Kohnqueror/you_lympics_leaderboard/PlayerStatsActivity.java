@@ -37,9 +37,9 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
     private Player player;
     private String playerId;
     private TournamentSettings tournamentSettings;
-    private EditText planeSeatEditText;
+    private EditText planeSeatEditText, bonusPointsEditText;
     private TableLayout scoresTable;
-    private TextWatcher planeSeatWatcher;
+    private TextWatcher planeSeatWatcher, bonusPointsWatcher;
     private TextView headerRound2, headerRound3, summaryTextView;
     private Button generateSummaryButton;
     private ProgressBar summaryProgressBar;
@@ -57,6 +57,7 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
 
         playerId = getIntent().getStringExtra("PLAYER_ID");
         planeSeatEditText = findViewById(R.id.editText_plane_seat);
+        bonusPointsEditText = findViewById(R.id.editText_bonus_points);
         scoresTable = findViewById(R.id.tableLayout_scores);
         headerRound2 = findViewById(R.id.header_round2);
         headerRound3 = findViewById(R.id.header_round3);
@@ -263,6 +264,29 @@ public class PlayerStatsActivity extends AppCompatActivity implements PlayerData
             }
         };
         planeSeatEditText.addTextChangedListener(planeSeatWatcher);
+
+        if (bonusPointsWatcher != null) {
+            bonusPointsEditText.removeTextChangedListener(bonusPointsWatcher);
+        }
+        bonusPointsEditText.setText(String.valueOf(player.getBonusPoints()));
+        bonusPointsWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (player != null) {
+                    try {
+                        int points = Integer.parseInt(s.toString());
+                        player.setBonusPoints(points);
+                    } catch (NumberFormatException e) {
+                        player.setBonusPoints(0);
+                    }
+                }
+            }
+        };
+        bonusPointsEditText.addTextChangedListener(bonusPointsWatcher);
 
         while (scoresTable.getChildCount() > 1) {
             scoresTable.removeViewAt(1);

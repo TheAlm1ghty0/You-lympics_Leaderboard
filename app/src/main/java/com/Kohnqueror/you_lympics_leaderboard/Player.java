@@ -11,26 +11,26 @@ public class Player {
     private Map<String, String> scores;
     private int totalPoints;
     private String planeSeat;
+    private int bonusPoints = 0; // New field for bonus points
 
-    public Player() {
-    }
+    public Player() {}
 
     public Player(String name) {
         this.name = name;
         this.scores = new HashMap<>();
         this.planeSeat = "";
+        this.bonusPoints = 0;
         initializeScores();
         this.totalPoints = 0;
     }
 
     private void initializeScores() {
-        // Initializes 8 events to accommodate the twists
         for (int round = 1; round <= 3; round++) {
             for (int event = 1; event <= 8; event++) {
                 String key = "round" + round + "_event" + event;
-                if (event <= 4) { // Timed events
+                if (event <= 4) {
                     scores.put(key, "0.0");
-                } else { // Positional events
+                } else {
                     scores.put(key, "0");
                 }
             }
@@ -48,6 +48,8 @@ public class Player {
     public void setTotalPoints(int totalPoints) { this.totalPoints = totalPoints; }
     public String getPlaneSeat() { return planeSeat; }
     public void setPlaneSeat(String planeSeat) { this.planeSeat = planeSeat; }
+    public int getBonusPoints() { return bonusPoints; }
+    public void setBonusPoints(int bonusPoints) { this.bonusPoints = bonusPoints; }
 
     @Exclude
     public String getScore(int round, int event) {
@@ -74,7 +76,6 @@ public class Player {
     @Exclude
     public void calculateTotalPoints() {
         int calculatedTotal = 0;
-        // Scoring logic only applies to the first 6 events
         for (int event = 1; event <= 6; event++) {
             String r1ScoreStr = getScore(1, event);
             String r2ScoreStr = getScore(2, event);
@@ -133,6 +134,6 @@ public class Player {
                 } catch (NumberFormatException ignored) {}
             }
         }
-        this.totalPoints = calculatedTotal;
+        this.totalPoints = calculatedTotal + this.bonusPoints;
     }
 }
